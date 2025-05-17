@@ -13,6 +13,7 @@ def stream_users_in_batches(batch_size):
                 if not batch:
                     break
                 yield batch
+        return
     except Exception as e:
         raise Exception(e)
     finally:
