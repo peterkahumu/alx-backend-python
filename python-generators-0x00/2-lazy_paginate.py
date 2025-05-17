@@ -1,6 +1,7 @@
 from seed import connect_db
 
-def paginate_users(connection, page_size, offset):
+def paginate_users(page_size, offset):
+    connection = connect_db()
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM user_data LIMIT %s OFFSET %s", (page_size, offset))
         return cursor.fetchall()
@@ -13,7 +14,7 @@ def lazy_paginate(page_size):
     try:
         offset = 0
         while True:  # ✅ Only 1 loop
-            page = paginate_users(connection, page_size, offset)
+            page = paginate_users(page_size, offset)
             if not page:
                 break
             yield page
