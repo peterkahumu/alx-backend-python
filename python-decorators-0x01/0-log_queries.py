@@ -1,12 +1,23 @@
 import psycopg2
 import os
+from datetime import datetime
 
 def log_queries(func):
     def wrapper(*args, **kwargs):
         query = query = kwargs.get('query') or (args[0] if args else '')
-        print(f"[Log]: Executing SQL query: {query}")
+        print(f"[Log]: Executing SQL query: {query} at {datetime.now().time()}")
         return func(*args, **kwargs)    
     return wrapper
+
+def open_close_database(func):
+    def wrapper(*args, **kwargs):
+        connection = kwargs.get('connection') or (args[0] if args else '')
+        if not connection:
+            raise Exception("The wrapper cannot locate the connection to the database.")
+        
+        func(*args, **kwargs)
+
+        connection.close()
 
 @log_queries
 def fetch_all_users(query):
