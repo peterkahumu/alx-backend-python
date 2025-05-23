@@ -9,16 +9,6 @@ def log_queries(func):
         return func(*args, **kwargs)    
     return wrapper
 
-def open_close_database(func):
-    def wrapper(*args, **kwargs):
-        connection = kwargs.get('connection') or (args[0] if args else '')
-        if not connection:
-            raise Exception("The wrapper cannot locate the connection to the database.")
-        
-        func(*args, **kwargs)
-
-        connection.close()
-
 @log_queries
 def fetch_all_users(query):
     try:
