@@ -43,6 +43,7 @@ with DatabaseContextManager(
     os.environ.get("DB_PORT", 5433)
 ) as db_conn:
     cursor = db_conn.cursor()
+    # cursor.execute("SELECT * FROM users")
     cursor.execute("SELECT * FROM user_data WHERE user_id = '5d6c699b-c6e5-4f28-a795-a8dbd55b00ff'")
     print(cursor.fetchall())
     
