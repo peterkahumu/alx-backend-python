@@ -22,7 +22,7 @@ def fetch_users_with_cache(conn, query):
     return cursor.fetchall()
 
 # First call caches the result
-users = fetch_users_with_cache(query="SELECT * FROM 
+users = fetch_users_with_cache(query="SELECT * FROM user_data")
 
 # Second call returns cached result
 users_again = fetch_users_with_cache(query="SELECT * FROM user_data")
