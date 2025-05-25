@@ -1,37 +1,25 @@
 import asyncio
-import asyncpg
-import os
 import aiosqlite
 
+DB_PATH = "users.db"
+
 async def async_fetch_users():
-    conn = await asyncpg.connect(
-        database=os.environ.get("DB_NAME"),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD"),
-        host=os.environ.get("DB_HOST", "localhost"),
-        port=int(os.environ.get("DB_PORT", 5432))
-    )
-    try:
-        users = await conn.fetch("SELECT * FROM user_data")
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute("SELECT * FROM user_data")
+        users = await cursor.fetchall()
+        await cursor.close()
         for user in users:
             print(user)
-    finally:
-        await conn.close()
+        return users
 
 async def async_fetch_older_users():
-    conn = await asyncpg.connect(
-        database=os.environ.get("DB_NAME"),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD"),
-        host=os.environ.get("DB_HOST", "localhost"),
-        port=int(os.environ.get("DB_PORT", 5432))
-    )
-    try:
-        older_users = await conn.fetch("SELECT * FROM user_data WHERE age > 40")
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute("SELECT * FROM user_data WHERE age > 40")
+        older_users = await cursor.fetchall()
+        await cursor.close()
         for user in older_users:
             print(user)
-    finally:
-        await conn.close()
+        return older_users
 
 async def fetch_concurrently():
     await asyncio.gather(
