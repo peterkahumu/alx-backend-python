@@ -1,24 +1,43 @@
 # GitHub Org Utils – Python Unit Testing
 
-This project is a Python-based utility module that includes helper functions for working with nested dictionaries, fetching JSON from URLs, and memoizing method results. It's designed to be test-driven, with a strong focus on **unit testing using `unittest` and `parameterized`**.
+This project is a Python utility module that provides helper functions for working with nested dictionaries, fetching JSON data from URLs, and memoizing method results. The codebase is structured with a strong emphasis on unit testing.
 
 ---
 
 ## Features
 
-- `access_nested_map`: Safely access values deep within nested dictionaries using a sequence of keys.
-- `get_json`: Fetch and parse JSON from a remote URL.
-- `memoize`: Decorator to cache method results per instance to improve performance.
-- Clean and isolated unit tests for each utility function.
+- `access_nested_map`: Access values in nested dictionaries using a list or tuple of keys.
+- `get_json`: Retrieve and parse JSON content from a given HTTP URL.
+- `memoize`: Decorator that caches method results to optimize repeated calls.
 
 ---
 
 ## Testing
 
-The project includes comprehensive unit tests using the built-in `unittest` framework, enhanced by `parameterized` to run multiple input scenarios in a clean, readable way.
+Unit tests are written using Python’s built-in `unittest` framework and enhanced with `parameterized` to cover multiple input scenarios efficiently.
 
-Each function is tested for expected behavior and edge cases (like invalid input or errors).
+### Tests for `access_nested_map`
 
----
+Two categories of tests are implemented:
 
-More sections coming soon...
+1. **Valid access tests**: 
+   These tests confirm that `access_nested_map` returns the correct value for given nested dictionary paths.
+
+   Example scenarios:
+   - `{"a": 1}, path=("a",)` → returns `1`
+   - `{"a": {"b": 2}}, path=("a",)` → returns `{"b": 2}`
+   - `{"a": {"b": 2}}, path=("a", "b")` → returns `2`
+
+2. **Exception tests**:
+   These tests verify that the function raises a `KeyError` when the key path is invalid or missing in the dictionary.
+
+   Example scenarios:
+   - `{}`, path `("a",)`
+   - `{"a": 1}`, path `("a", "b")`
+
+Each test case is parameterized to keep the test logic concise and readable.
+
+To run the tests:
+```bash
+python test_utils.py
+```
