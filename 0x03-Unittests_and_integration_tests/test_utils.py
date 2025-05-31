@@ -46,7 +46,7 @@ class TestGetJson(unittest.TestCase):
         """
     Test that get_json calls requests.get with the correct URL and
     returns the expected JSON payload.
-    """   
+    """
         test_cases = [
             ('https://example.com', {"payload": True}),
             ('http://holberton.io', {"payload": True}),
