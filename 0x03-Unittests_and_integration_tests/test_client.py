@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
+
+"""This file provides documentation code for the client.py file code."""
 import unittest
 from unittest.mock import Mock, patch, PropertyMock
 from parameterized import parameterized
 
 from client import GithubOrgClient
+
 
 class TestGithubOrgClient(unittest.TestCase):
     """Test GithubOrgClient class"""
@@ -32,7 +35,6 @@ class TestGithubOrgClient(unittest.TestCase):
     @patch('client.get_json')
     def test_public_repos(self, mock_get_json):
         """Test public_repos returns expected repo names"""
-        # Fake payload returned by get_json
         mock_payload = [
             {"name": "repo1"},
             {"name": "repo2"},
@@ -40,7 +42,6 @@ class TestGithubOrgClient(unittest.TestCase):
         ]
         mock_get_json.return_value = mock_payload
 
-        # Mock _public_repos_url to avoid calling the real org method
         with patch.object(GithubOrgClient, "_public_repos_url", new_callable=PropertyMock) as mock_url:
             mock_url.return_value = "https://api.github.com/orgs/test-org/repos"
 
@@ -50,5 +51,6 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertEqual(repos, ["repo1", "repo2", "repo3"])
             mock_url.assert_called_once()
             mock_get_json.assert_called_once_with("https://api.github.com/orgs/test-org/repos")
+
 if __name__ == '__main__':
     unittest.main()
