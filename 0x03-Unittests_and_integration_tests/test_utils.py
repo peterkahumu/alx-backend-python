@@ -19,7 +19,7 @@ class TestAccessNestedMap(unittest.TestCase):
     ])
     def test_access_nested_map(self, nested_map, path, expected):
         """
-        Test that `access_nested_map` returns the correct value for a given nested map and path.
+        Test that `access_nested_map` returns the desired key/value.
 
         Args:
             nested_map (dict): The nested dictionary to access.
@@ -46,8 +46,7 @@ class TestGetJson(unittest.TestCase):
         """
     Test that get_json calls requests.get with the correct URL and
     returns the expected JSON payload.
-    """
-        
+    """   
         test_cases = [
             ('https://example.com', {"payload": True}),
             ('http://holberton.io', {"payload": True}),
