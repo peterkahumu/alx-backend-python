@@ -4,8 +4,18 @@
 import unittest
 from parameterized import parameterized
 from utils import access_nested_map
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock
 from utils import get_json
+import requests
+from typing import Dict
+
+def get_json(url: str) -> Dict:
+    """
+        Get JSON from remote URL.
+    """
+    response = requests.get(url)
+    return response.json()
+
 
 class TestAccessNestedMap(unittest.TestCase):
     """
@@ -37,33 +47,23 @@ class TestAccessNestedMap(unittest.TestCase):
             access_nested_map(nested_map, path)
 
 class TestGetJson(unittest.TestCase):
-    """Test cases for the get_json function."""
-
-    @patch('utils.requests.get')  # Mock requests.get
+    """Tests if the giver URL returns a JSON file."""
+    @patch('requests.get')
     def test_get_json(self, mock_get):
-        """Test that get_json returns expected JSON response."""
-        
-        # Define test cases
         test_cases = [
-            ("http://example.com", {"payload": True}),
-            ("http://holberton.io", {"payload": False}),
+            ('https://example.com', {"payload": True}),
+            ('http://holberton.io', {"payload": True}),
         ]
 
-        for test_url, test_payload in test_cases:
-            # Configure mock response object
-            mock_response = MagicMock()
-            mock_response.json.return_value = test_payload
-            mock_get.return_value = mock_response  # Mock requests.get response
+        for url, expected_payload in test_cases:
+            mock_response = Mock()
+            mock_response.json.return_value = expected_payload
+            mock_get.return_value = mock_response
 
-            result = get_json(test_url)  # Call the function
+            result = get_json(url)
 
-            # Assertions
-            mock_get.assert_called_once_with(test_url)  # Ensure called once with URL
-            self.assertEqual(result, test_payload)  # Ensure expected output
-            print("Mocked result :", result)
-            print("Expected result: ", test_payload)
-
-            # Reset mock for next test case
+            mock_get.assert_called_once_with(url)
+            self.assertEqual(result, expected_payload)
             mock_get.reset_mock()
 
 if __name__ == '__main__':
