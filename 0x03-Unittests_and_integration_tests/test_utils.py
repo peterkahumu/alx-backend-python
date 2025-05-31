@@ -38,30 +38,23 @@ class TestAccessNestedMap(unittest.TestCase):
             access_nested_map(nested_map, path)
 
 
+
 class TestGetJson(unittest.TestCase):
-    """Tests if the given URL returns a JSON file."""
-
+    """Test cases for the get_json function."""
+    
+    @parameterized.expand([
+        ("http://example.com", {"payload": True}),
+        ("http://holberton.io", {"payload": False}),
+    ])
     @patch('utils.requests.get')
-    def test_get_json(self, mock_get):
-        """
-    Test that get_json calls requests.get with the correct URL and
-    returns the expected JSON payload.
-    """
-        test_cases = [
-            ('https://example.com', {"payload": True}),
-            ('http://holberton.io', {"payload": True}),
-        ]
-
-        for url, expected_payload in test_cases:
-            mock_response = Mock()
-            mock_response.json.return_value = expected_payload
-            mock_get.return_value = mock_response
-
-            result = get_json(url)
-
-            mock_get.assert_called_once_with(url)
-            self.assertEqual(result, expected_payload)
-            mock_get.reset_mock()
+    def test_get_json(self, test_url, test_payload, mock_get):
+        """Test that get_json returns expected result without making HTTP calls."""
+        mock_response = Mock()
+        mock_response.json.return_value = test_payload
+        mock_get.return_value = mock_response
+        result = get_json(test_url)
+        mock_get.assert_called_once_with(test_url)
+        self.assertEqual(result, test_payload)
 
 
 class TestMemoize(unittest.TestCase):
