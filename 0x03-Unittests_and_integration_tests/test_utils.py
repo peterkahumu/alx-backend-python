@@ -60,6 +60,8 @@ class TestGetJson(unittest.TestCase):
             # Assertions
             mock_get.assert_called_once_with(test_url)  # Ensure called once with URL
             self.assertEqual(result, test_payload)  # Ensure expected output
+            print("Mocked result :", result)
+            print("Expected result: ", test_payload)
 
             # Reset mock for next test case
             mock_get.reset_mock()
