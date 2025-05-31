@@ -3,18 +3,10 @@
 
 import unittest
 from parameterized import parameterized
-from utils import access_nested_map
+from utils import access_nested_map, get_json, memoize
 from unittest.mock import patch, Mock
-from utils import get_json
 import requests
-from typing import Dict
 
-def get_json(url: str) -> Dict:
-    """
-        Get JSON from remote URL.
-    """
-    response = requests.get(url)
-    return response.json()
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -48,7 +40,7 @@ class TestAccessNestedMap(unittest.TestCase):
 
 class TestGetJson(unittest.TestCase):
     """Tests if the giver URL returns a JSON file."""
-    @patch('requests.get')
+    @patch('utils.requests.get')
     def test_get_json(self, mock_get):
         test_cases = [
             ('https://example.com', {"payload": True}),
@@ -65,6 +57,31 @@ class TestGetJson(unittest.TestCase):
             mock_get.assert_called_once_with(url)
             self.assertEqual(result, expected_payload)
             mock_get.reset_mock()
+
+class TestMemoize(unittest.TestCase):
+    """Test cases for the memoize decorator"""
+    def test_memoize(self):
+        """Test that the memoize decorator caches method results."""
+        class TestClass:
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+            
+        test_instance = TestClass()
+
+        with patch.object(TestClass, 'a_method') as mock_method:
+            mock_method.return_value = 42
+
+            result1 = test_instance.a_property
+            result2 = test_instance.a_property
+
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
+
+            mock_method.assert_called_once()
 
 if __name__ == '__main__':
     unittest.main()
