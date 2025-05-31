@@ -37,7 +37,8 @@ class TestAccessNestedMap(unittest.TestCase):
             access_nested_map(nested_map, path)
 
 class TestGetJson(unittest.TestCase):
-    @patch('client.requests.get')
+    
+    @patch('utils.requests.get')
     def test_get_json(self, mock_get):
         test_cases = [
             ('http://example.com', {"payload": True}),
