@@ -2,10 +2,11 @@
 
 """Unit tests for client.py using mock and parameterized."""
 import unittest
-from unittest.mock import patch, PropertyMock
-from parameterized import parameterized
+from unittest.mock import patch, PropertyMock, MagicMock
+from parameterized import parameterized, parameterized_class
 
 from client import GithubOrgClient
+from fixtures import TEST_PAYLOAD
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -94,6 +95,38 @@ class TestGithubOrgClient(unittest.TestCase):
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
 
+
+@parameterized_class([
+    {
+        'org_payload': TEST_PAYLOAD[0][0],
+        'repos_payload': TEST_PAYLOAD[0][1],
+        'expected_repos': TEST_PAYLOAD[0][2],
+        'apache2_repos': TEST_PAYLOAD[0][3],
+    },
+])
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """Integration tests for GithubOrgClient.public_repos"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up patcher for requests.get with fixture responses"""
+        cls.get_patcher = patch('requests.get')
+        mock_get = cls.get_patcher.start()
+
+        # Create mock responses
+        mock_org = MagicMock()
+        mock_org.json.return_value = cls.org_payload
+
+        mock_repos = MagicMock()
+        mock_repos.json.return_value = cls.repos_payload
+
+        # Set side_effect to return responses based on call order
+        mock_get.side_effect = [mock_org, mock_repos]
+
+    @classmethod
+    def tearDownClass(cls):
+        """Stop patcher after tests"""
+        cls.get_patcher.stop()
 
 if __name__ == '__main__':
     unittest.main()
