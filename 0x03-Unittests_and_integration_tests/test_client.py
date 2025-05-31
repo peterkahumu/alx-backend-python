@@ -78,7 +78,7 @@ class TestGithubOrgClient(unittest.TestCase):
             mock_get_json.assert_called_once_with(
                 "https://api.github.com/orgs/test-org/repos"
             )
-        
+       
     @parameterized.expand([
         (
             {"license": {"key": "my_license"}}, "my_license", True
@@ -109,25 +109,27 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Set up patcher for requests.get with fixture responses"""
         cls.get_patcher = patch('requests.get')
         mock_get = cls.get_patcher.start()
 
-        # Create mock responses
-        mock_org = MagicMock()
-        mock_org.json.return_value = cls.org_payload
+        def mock_get_json(url, *args, **kwargs):
+            if url == "https://api.github.com/orgs/test-org":
+                mock_resp = MagicMock()
+                mock_resp.json.return_value = cls.org_payload
+                return mock_resp
+            elif url == cls.org_payload["repos_url"]:
+                mock_resp = MagicMock()
+                mock_resp.json.return_value = cls.repos_payload
+                return mock_resp
+            else:
+                raise ValueError(f"Unexpected URL: {url}")
 
-        mock_repos = MagicMock()
-        mock_repos.json.return_value = cls.repos_payload
-
-        # Set side_effect to return responses based on call order
-        mock_get.side_effect = [mock_org, mock_repos]
+        mock_get.side_effect = mock_get_json
 
     @classmethod
     def tearDownClass(cls):
         """Stop patcher after tests"""
         cls.get_patcher.stop()
-
 
     def test_public_repos(self):
         """Test public_repos returns expected repos from fixtures"""
