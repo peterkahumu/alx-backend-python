@@ -6,7 +6,9 @@ from rest_framework.decorators import action
 from .models import User, Conversation, Message
 from .permissions import IsParticipantOfConversation
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import HTTP_403_FORBIDDEN
 
+conversation_id = "conversation_id"
 
 class ConversationViewSet(viewsets.ModelViewSet):
     """
