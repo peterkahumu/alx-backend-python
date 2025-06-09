@@ -33,6 +33,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = "chats.User"
+
 
 # Application definition
 
