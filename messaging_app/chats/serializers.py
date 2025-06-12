@@ -6,20 +6,27 @@ from .models import User, Conversation, Message
 
 class UserSerializer(serializers.ModelSerializer):
     """Model to create/display the user"""
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-    confirm_password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
+    confirm_password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
         fields = [
-            'username', 'email', 'first_name', 'last_name',
+            'user_id','username', 'email', 'first_name', 'last_name',
             'bio', 'phone_number', 'password', 'confirm_password'
         ]
         read_only_fields = ['user_id']
 
     def validate(self, data):
-        if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError("Passwords do not match")
+        """Validate password to:
+        1. Ensure it is provided during create.
+        2. Exclude it as required from PUT and PATCH  if not provided
+        """
+        if self.context['request'].method == 'POST':
+            if not data.get('password') or not data.get('confirm_password'):
+                raise serializers.ValidationError("Password and confirm_password are required.")
+            if data['password'] != data['confirm_password']:
+                raise serializers.ValidationError("Passwords do not match")
         return data
 
     def create(self, validated_data):
@@ -30,6 +37,23 @@ class UserSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return user
+    
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        confirm_password = validated_data.pop('confirm_password', None)
+
+        # Only update password if both are provided and match
+        if password and confirm_password:
+            if password != confirm_password:
+                raise serializers.ValidationError({"password": "Passwords do not match."})
+            instance.set_password(password)
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -37,7 +61,8 @@ class ConversationSerializer(serializers.ModelSerializer):
     participants = serializers.SlugRelatedField(
         many=True,
         slug_field='username',
-        queryset=User.objects.all()
+        queryset=User.objects.all(),
+        required = False
     )
 
     class Meta:
