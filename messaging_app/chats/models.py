@@ -2,6 +2,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxLengthValidator
 
 
 class User(AbstractUser):
@@ -43,12 +44,14 @@ class Message(models.Model):
     message_id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
     conversation = models.ForeignKey(Conversation, related_name='messages', on_delete=models.CASCADE)
     sender = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
-    message_body = models.TextField()
+    message_body = models.TextField(validators=[MaxLengthValidator(1000)])
     sent_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.message_id} sent by {self.sender.username}"
 
     class Meta:
-        ordering = ['-sent_at']
+        ordering = ['sent_at'] # oldest messages first.
+
+
 

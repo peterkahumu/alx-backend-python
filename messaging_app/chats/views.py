@@ -1,6 +1,9 @@
 """Views for the user, conversation and messages"""
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework.decorators import action
+from rest_framework import status
+from rest_framework.response import Response
 
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -16,12 +19,6 @@ class UserView(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsSelfOrReadOnly,]
 
-    def get_queryset(self):
-        user_id = self.kwargs.get('pk')
-        if user_id:
-            return User.objects.filter(pk = user_id)
-        return User.objects.filter(pk = self.request.user.pk)
-    
     def get_permissions(self):
         if self.request.method == 'POST':
             return [permissions.AllowAny()]        
@@ -41,23 +38,13 @@ class MessageView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         conversation = self.kwargs.get('conversation_pk')
-        print("ID is: ", conversation)
-        print("conversation = ", get_object_or_404(Conversation, pk=conversation))
-        return Message.objects.filter(converstation_id = conversation)
+        return Message.objects.filter(conversation_id = conversation)
 
     def perform_create(self, serializer):
-        return serializer.save(sender = self.request.user)
-    
-    def perform_update(self, serializer):
-        if serializer.instance.sender != self.request.user:
-            raise PermissionDenied("You cannot edit messages you didn't send.")
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.sender != self.request.user:
-            raise PermissionDenied("You cannot delete messages you didn't send.")
-        instance.delete()
-
+        sender = self.request.user
+        conversation_pk = self.kwargs.get('conversation_pk')
+        conversation = get_object_or_404(Conversation, pk = conversation_pk)
+        return serializer.save(sender = sender, conversation = conversation)
 
 class ConversationView(viewsets.ModelViewSet):
     """Allow users to create, update and delete conversations they are part of."""
@@ -69,9 +56,29 @@ class ConversationView(viewsets.ModelViewSet):
         """Save the conversation and automatically add
         the requesting user as a participant."""
         conversation = serializer.save()
-        conversation.participants.add(self.request.user)
+        if self.request.user not in conversation.participants.all():
+            conversation.participants.add(self.request.user)
     
     def get_queryset(self):
         """Only return conversations where the request user is a participant."""
         return Conversation.objects.filter(participants = self.request.user)
+    
+    @action(detail=True, methods=['post'], url_path='add-participant')
+    def add_participant(self, request, pk=None):
+        conversation = self.get_object()
+
+        if request.user not in conversation.participants.all():
+            raise PermissionDenied("You are not a member in this conversation.")
+        
+        user_id = request.data.get('user_id')
+        if not user_id:
+            return Response({"error": "User ID is required."}, status = status.HTTP_400_BAD_REQUEST)
+        
+        user = get_object_or_404(User, pk=user_id)
+
+        if user in conversation.participants.all():
+            return Response({"message": "User already exists in conversation."}, status=status.HTTP_200_OK)
+
+        conversation.participants.add(user)
+        return Response({"success": f"{user.username} added to conversation"}, status=status.HTTP_200_OK)
     

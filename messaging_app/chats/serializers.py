@@ -27,6 +27,9 @@ class UserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Password and confirm_password are required.")
             if data['password'] != data['confirm_password']:
                 raise serializers.ValidationError("Passwords do not match")
+        
+        if len(data.get('phone_number')) > 15:
+            raise serializers.ValidationError("Phone number cannot be null or have more than 15 characters.")
         return data
 
     def create(self, validated_data):
@@ -76,6 +79,7 @@ class MessageSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='sender.username', read_only=True)
     first_name = serializers.CharField(source='sender.first_name', read_only=True)
     last_name = serializers.CharField(source='sender.last_name', read_only=True)
+    message_body = serializers.CharField(max_length = 1000)
 
     class Meta:
         model = Message
@@ -84,6 +88,6 @@ class MessageSerializer(serializers.ModelSerializer):
             'conversation', 'message_body', 'sent_at'
         ]
         read_only_fields = [
-            'message_id', 'sent_at', 'username', 'first_name', 'last_name'
+            'message_id', 'sent_at', 'username', 'first_name', 'last_name', 'conversation'
         ]
 

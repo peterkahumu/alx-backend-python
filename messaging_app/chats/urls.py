@@ -7,7 +7,7 @@ router = DefaultRouter()
 router.register(r'conversations', ConversationView, basename='conversations')
 
 # nested router for messages.
-convo_router = routers.NestedDefaultRouter(router, r'conversations', lookup = 'conversations')
+convo_router = routers.NestedDefaultRouter(router, r'conversations', lookup = 'conversation')
 convo_router.register(r'messages', MessageView, basename='conversation-messages')
 
 urlpatterns = [
