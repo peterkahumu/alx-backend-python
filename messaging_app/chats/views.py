@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import UserSerializer, ConversationSerializer, MessageSerializer
 from .models import User, Message, Conversation
@@ -35,6 +36,8 @@ class MessageView(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsSenderOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['sender']
 
     def get_queryset(self):
         conversation = self.kwargs.get('conversation_pk')
