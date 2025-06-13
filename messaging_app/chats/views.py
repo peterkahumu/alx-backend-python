@@ -4,6 +4,7 @@ from rest_framework import permissions
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework import filters
 
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -36,12 +37,17 @@ class MessageView(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsSenderOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['sender']
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['sender', 'sent_at']
+    search_fields = ['message_body']
 
     def get_queryset(self):
-        conversation = self.kwargs.get('conversation_pk')
-        return Message.objects.filter(conversation_id = conversation)
+        conversation_pk = self.kwargs.get('conversation_pk')
+        conversation = get_object_or_404(Conversation, pk=conversation_pk)
+
+        if self.request.user in conversation.participants.all():
+            return Message.objects.filter(conversation_id = conversation)
+        raise PermissionDenied("You cannot view messages in this conversation.")
 
     def perform_create(self, serializer):
         sender = self.request.user
