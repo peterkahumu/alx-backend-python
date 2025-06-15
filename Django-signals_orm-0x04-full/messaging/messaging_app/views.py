@@ -1,6 +1,8 @@
 from django.shortcuts import render
 
 from rest_framework import viewsets
+
+
 from .serializers import MessageSerializer, NotificationSerializer, MessageHistorySerializer
 from .models import Message, Notification, MessageHistory
 
@@ -22,4 +24,5 @@ class MessageHistoryViewset(viewsets.ModelViewSet):
     queryset = MessageHistory.objects.all()
     permission_classes = []
     authentication_classes = []
+
 
