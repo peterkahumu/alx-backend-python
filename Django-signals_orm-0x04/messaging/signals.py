@@ -17,4 +17,3 @@ def log_message_edit(sender, instance, **kwargs):
                 old_content = original.content
             )
             instance.edited = True
-            

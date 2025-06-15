@@ -15,7 +15,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         fields = ['user', 'message']
 
 class MessageHistorySerializer(serializers.ModelSerializer):
+    edited_by = serializers.PrimaryKeyRelatedField(required = False, read_only=True)
     class Meta:
         model = MessageHistory
-        fields = ['message', 'old_content', 'created_at']
-        
+        fields = ['message', 'old_content', 'edited_by', 'edited_by']
