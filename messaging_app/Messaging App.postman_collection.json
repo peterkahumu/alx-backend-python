@@ -220,7 +220,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "// Please change the details below while running these tests.\r\n{\r\n    \"username\": \"martin\",\r\n    \"first_name\": \"peter\",\r\n    \"last_name\": \"peter\",\r\n    \"email\": \"martin@email.com\",\r\n    \"phone_number\": \"+ 254783925820\",\r\n    \"password\": \"pita82mumbi05\",\r\n    \"confirm_password\": \"pita82mumbi05\"\r\n}",
+							"raw": "// Please change the details below while running these tests.\r\n{\r\n    \"username\": \"martin\",\r\n    \"first_name\": \"peter\",\r\n    \"last_name\": \"peter\",\r\n    \"email\": \"martin@email.com\",\r\n    \"phone_number\": \"+ 254783925820\",\r\n    \"password\": \"\",\r\n    \"confirm_password\": \"\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -469,7 +469,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"james\",\r\n    \"first_name\": \"james\",\r\n    \"last_name\": \"james\",\r\n    \"email\": \"james@email.com\",\r\n    \"phone_number\": \"+254765893023\",\r\n    \"password\": \"pita82mumbi05\",\r\n    \"password\": \"pita82mumbi05\"\r\n}",
+							"raw": "{\r\n    \"username\": \"james\",\r\n    \"first_name\": \"james\",\r\n    \"last_name\": \"james\",\r\n    \"email\": \"james@email.com\",\r\n    \"phone_number\": \"+254765893023\",\r\n    \"password\": \"\",\r\n    \"password\": \"\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
