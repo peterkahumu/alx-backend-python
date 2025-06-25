@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: django-messaging-app
+  name: django-green
 spec:
   replicas: 1
   selector:
@@ -10,7 +10,8 @@ spec:
   template:
     metadata:
       labels:
-        app: django-messaging
+        app: django
+        version: green
     spec:
       containers:
         - name: django-containers
