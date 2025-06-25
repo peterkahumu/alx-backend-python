@@ -6,7 +6,8 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: django-messaging
+      app: django
+      version: blue
   template:
     metadata:
       labels:
@@ -15,7 +16,7 @@ spec:
     spec:
       containers:
         - name: django-containers
-          image: petermuhumuki/django-messaging:latest
+          image: petermuhumuki/django-messaging:2.0
           ports:
             - containerPort: 8000
           env:
