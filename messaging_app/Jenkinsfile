@@ -1,8 +1,9 @@
 pipeline {
     agent any
-    
+
     environment {
-        VENV = 'venv'
+        IMAGE_NAME = 'your-dockerhub-username/messaging-app'
+        TAG = 'latest'
     }
 
     stages {
@@ -19,17 +20,25 @@ pipeline {
             }
         }
 
-        stage('Set up venv') {
+        stage('Build Docker Image') {
             steps {
-                sh 'python3 -m venv $VENV'
-                sh './$VENV/bin/pip && pip3 install --upgrade pip'
-                sh './$VENV/bin/pip && pip3 install -r messaging_app/requirements.txt'
+                sh "docker build -t $IMAGE_NAME:$TAG messaging_app/"
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Tests in Docker') {
             steps {
-                sh './$VENV/bin/pytest messaging_app/tests --junitxml=report.xml'
+                sh "docker run --rm --entrypoint '' $IMAGE_NAME:$TAG pytest messaging_app/tests --junitxml=report.xml"
+            }
+        }
+
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                    sh "docker push $IMAGE_NAME:$TAG"
+                }
             }
         }
 
@@ -46,5 +55,3 @@ pipeline {
         }
     }
 }
-
-// git branch
